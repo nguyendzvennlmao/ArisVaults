@@ -1,0 +1,10 @@
+name: ArisVaults
+version: 1.1
+main: me.aris.arisvault.ArisVaults
+api-version: '1.20'
+author: VennLMAO
+folia-supported: true
+commands:
+  pv:
+    description: Mo kho do ca nhan
+    usage: /pv <number>
