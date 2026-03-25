@@ -15,7 +15,6 @@ settings:
     menu-open: BLOCK_CHEST_OPEN
     vault-open: BLOCK_BARREL_OPEN
     vault-close: BLOCK_CHEST_CLOSE
-
 messages:
   mode:
     chat: true
