@@ -8,6 +8,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -76,19 +77,16 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
 
     private void sendNotification(Player p, String msg) {
         String formatted = ColorUtils.color(msg);
-        if (getConfig().getBoolean("messages.mode.chat")) {
-            p.sendMessage(formatted);
-        }
-        if (getConfig().getBoolean("messages.mode.actionbar")) {
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(formatted));
-        }
+        if (getConfig().getBoolean("messages.mode.chat")) p.sendMessage(formatted);
+        if (getConfig().getBoolean("messages.mode.actionbar")) p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(formatted));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
         String t = e.getView().getTitle();
-        if (t.equals(ColorUtils.color(getConfig().getString("settings.menu.title")))) {
+        String menuTitle = ColorUtils.color(getConfig().getString("settings.menu.title"));
+        if (t.equals(menuTitle)) {
             e.setCancelled(true);
             if (e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta()) return;
             String rawName = net.md_5.bungee.api.ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
@@ -96,19 +94,15 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
                 int v = Integer.parseInt(rawName.replaceAll("[^0-9]", ""));
                 p.getScheduler().run(this, (task) -> openVault(p, v), null);
             } catch (Exception ignored) {}
-        } else if (t.contains("Kho đồ số ")) {
-            try {
-                int v = Integer.parseInt(t.replaceAll("[^0-9]", ""));
-                manager.save(p, v, e.getInventory());
-            } catch (Exception ignored) {}
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onClose(InventoryCloseEvent e) {
-        if (e.getView().getTitle().contains("Kho đồ số ")) {
+        String title = e.getView().getTitle();
+        if (title.contains("Kho đồ số ")) {
             try {
-                int v = Integer.parseInt(e.getView().getTitle().replaceAll("[^0-9]", ""));
+                int v = Integer.parseInt(title.replaceAll("[^0-9]", ""));
                 manager.save((Player) e.getPlayer(), v, e.getInventory());
                 play((Player) e.getPlayer(), "vault-close");
             } catch (Exception ignored) {}
@@ -116,6 +110,8 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
     }
 
     private void play(Player p, String k) {
-        p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("settings.sounds." + k)), 1f, 1f);
+        try {
+            p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("settings.sounds." + k)), 1f, 1f);
+        } catch (Exception ignored) {}
     }
-  }
+    }
