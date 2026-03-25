@@ -123,4 +123,4 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
             p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("settings.sounds." + k)), 1f, 1f);
         } catch (Exception ignored) {}
     }
-            }
+    }
