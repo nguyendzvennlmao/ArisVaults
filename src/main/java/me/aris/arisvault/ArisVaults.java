@@ -86,29 +86,32 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
         if (!(e.getWhoClicked() instanceof Player p)) return;
         String title = e.getView().getTitle();
         String menuTitle = ColorUtils.color(getConfig().getString("settings.menu.title"));
-        String vaultPrefix = ColorUtils.color(getConfig().getString("settings.vault.title").split("%number%")[0]);
 
         if (title.equals(menuTitle)) {
-            e.setCancelled(true);
-            if (e.getClickedInventory() != e.getView().getTopInventory()) return;
-            if (e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta()) return;
-            
-            String rawName = net.md_5.bungee.api.ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
-            try {
-                int v = Integer.parseInt(rawName.replaceAll("[^0-9]", ""));
-                p.getScheduler().run(this, (task) -> openVault(p, v), null);
-            } catch (Exception ignored) {}
+            if (e.getClickedInventory() == e.getView().getTopInventory()) {
+                e.setCancelled(true);
+                if (e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta()) return;
+                String rawName = net.md_5.bungee.api.ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
+                try {
+                    int v = Integer.parseInt(rawName.replaceAll("[^0-9]", ""));
+                    p.getScheduler().run(this, (task) -> openVault(p, v), null);
+                } catch (Exception ignored) {}
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClose(InventoryCloseEvent e) {
         String title = e.getView().getTitle();
-        String vaultPrefix = ColorUtils.color(getConfig().getString("settings.vault.title").split("%number%")[0]);
+        String vaultTitleRaw = getConfig().getString("settings.vault.title").replace("%number%", "");
+        String vaultTitleColor = ColorUtils.color(vaultTitleRaw);
         
-        if (title.startsWith(vaultPrefix)) {
+        if (title.contains(vaultTitleColor) || title.contains("ᴋʜᴏ ᴠᴀᴜʟᴛ")) {
             try {
-                int v = Integer.parseInt(title.replaceAll("[^0-9]", ""));
+                String stripped = net.md_5.bungee.api.ChatColor.stripColor(title);
+                String numOnly = stripped.replaceAll("[^0-9]", "");
+                if (numOnly.isEmpty()) return;
+                int v = Integer.parseInt(numOnly);
                 manager.save((Player) e.getPlayer(), v, e.getInventory());
                 play((Player) e.getPlayer(), "vault-close");
             } catch (Exception ignored) {}
