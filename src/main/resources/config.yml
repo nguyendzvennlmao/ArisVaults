@@ -9,7 +9,7 @@ settings:
       - "&#facc15| &#ffffffᴄʟɪᴄᴋ Để ᴍở ᴋʜᴏ đồ"
       - ""
   vault:
-    title: "&#facc15ᴋʜᴏ Đồ số %number%"
+    title: "ᴋʜᴏ ᴠᴀᴜʟᴛ #%number%"
     rows: 6
   sounds:
     menu-open: BLOCK_ENDER_CHEST_OPEN
