@@ -81,14 +81,18 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
         if (getConfig().getBoolean("messages.mode.actionbar")) p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(formatted));
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
-        String t = e.getView().getTitle();
+        String title = e.getView().getTitle();
         String menuTitle = ColorUtils.color(getConfig().getString("settings.menu.title"));
-        if (t.equals(menuTitle)) {
+        String vaultPrefix = ColorUtils.color(getConfig().getString("settings.vault.title").split("%number%")[0]);
+
+        if (title.equals(menuTitle)) {
             e.setCancelled(true);
+            if (e.getClickedInventory() != e.getView().getTopInventory()) return;
             if (e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta()) return;
+            
             String rawName = net.md_5.bungee.api.ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
             try {
                 int v = Integer.parseInt(rawName.replaceAll("[^0-9]", ""));
@@ -100,7 +104,9 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClose(InventoryCloseEvent e) {
         String title = e.getView().getTitle();
-        if (title.contains("Kho đồ số ")) {
+        String vaultPrefix = ColorUtils.color(getConfig().getString("settings.vault.title").split("%number%")[0]);
+        
+        if (title.startsWith(vaultPrefix)) {
             try {
                 int v = Integer.parseInt(title.replaceAll("[^0-9]", ""));
                 manager.save((Player) e.getPlayer(), v, e.getInventory());
