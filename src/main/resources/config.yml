@@ -1,0 +1,23 @@
+settings:
+  menu:
+    title: "&#facc15ᴋʜᴏ Đồ ᴄá ɴʜâɴ"
+    rows: 3
+    display-material: CHEST
+    item-name: "&#facc15ᴋʜᴏ Đồ số %number%"
+    item-lore:
+      - ""
+      - "&#facc15| &#ffffffᴄʟɪᴄᴋ Để ᴍở ᴋʜᴏ đồ"
+      - ""
+  vault:
+    title: "Kho đồ số %number%"
+    rows: 6
+  sounds:
+    menu-open: BLOCK_CHEST_OPEN
+    vault-open: BLOCK_BARREL_OPEN
+    vault-close: BLOCK_CHEST_CLOSE
+
+messages:
+  mode:
+    chat: true
+    actionbar: true
+  no-permission: "&#ff0812ʙạɴ ᴋʜôɴɢ ᴄó ǫᴜʏềɴ ᴍở ᴋʜᴏ đồ số %number%!"
