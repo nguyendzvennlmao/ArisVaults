@@ -1,9 +1,0 @@
-name: ArisVaults
-version: 1.0
-main: me.aris.arievault.ArisVaults
-api-version: 1.20
-folia-supported: true
-commands:
-  pv:
-    description: Mo kho do ca nhan
-    usage: /pv <number>
