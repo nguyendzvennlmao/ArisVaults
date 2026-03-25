@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.io.IOException;
 
@@ -12,9 +13,12 @@ public class VaultManager {
     public VaultManager(ArisVaults plugin) { this.plugin = plugin; }
 
     public void save(Player p, int n, Inventory inv) {
-        String base64 = SerializationUtils.toBase64(inv.getContents());
+        ItemStack[] contents = inv.getContents();
+        String base64 = SerializationUtils.toBase64(contents);
         Bukkit.getAsyncScheduler().runNow(plugin, (t) -> {
-            File f = new File(plugin.getDataFolder() + "/data", p.getUniqueId() + ".yml");
+            File folder = new File(plugin.getDataFolder(), "data");
+            if (!folder.exists()) folder.mkdirs();
+            File f = new File(folder, p.getUniqueId() + ".yml");
             YamlConfiguration c = YamlConfiguration.loadConfiguration(f);
             c.set("v." + n, base64);
             try { c.save(f); } catch (IOException ignored) {}
@@ -29,8 +33,10 @@ public class VaultManager {
         if (f.exists()) {
             YamlConfiguration c = YamlConfiguration.loadConfiguration(f);
             String d = c.getString("v." + n);
-            if (d != null) inv.setContents(SerializationUtils.fromBase64(d, r));
+            if (d != null && !d.isEmpty()) {
+                inv.setContents(SerializationUtils.fromBase64(d, r));
+            }
         }
         return inv;
     }
-  }
+                }
