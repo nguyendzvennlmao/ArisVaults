@@ -103,13 +103,11 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClose(InventoryCloseEvent e) {
         String title = e.getView().getTitle();
-        String vaultTitleRaw = getConfig().getString("settings.vault.title").replace("%number%", "");
-        String vaultTitleColor = ColorUtils.color(vaultTitleRaw);
+        String strippedTitle = net.md_5.bungee.api.ChatColor.stripColor(title);
         
-        if (title.contains(vaultTitleColor) || title.contains("ᴋʜᴏ ᴠᴀᴜʟᴛ")) {
+        if (strippedTitle.contains("Vault #") || strippedTitle.contains("Kho đồ số")) {
             try {
-                String stripped = net.md_5.bungee.api.ChatColor.stripColor(title);
-                String numOnly = stripped.replaceAll("[^0-9]", "");
+                String numOnly = strippedTitle.replaceAll("[^0-9]", "");
                 if (numOnly.isEmpty()) return;
                 int v = Integer.parseInt(numOnly);
                 manager.save((Player) e.getPlayer(), v, e.getInventory());
@@ -123,4 +121,4 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
             p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("settings.sounds." + k)), 1f, 1f);
         } catch (Exception ignored) {}
     }
-    }
+                }
