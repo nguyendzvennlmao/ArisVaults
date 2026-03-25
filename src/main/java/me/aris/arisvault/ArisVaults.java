@@ -25,6 +25,7 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        if (!getDataFolder().exists()) getDataFolder().mkdirs();
         new File(getDataFolder(), "data").mkdirs();
         this.manager = new VaultManager(this);
         getCommand("pv").setExecutor(this);
@@ -78,25 +79,35 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
         if (t.equals(ColorUtils.color(getConfig().getString("settings.menu.title")))) {
             e.setCancelled(true);
             if (e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta()) return;
-            String n = net.md_5.bungee.api.ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
-            int v = Integer.parseInt(n.replaceAll("[^0-9]", ""));
-            Bukkit.getRegionScheduler().runNow(this, p.getLocation(), (tk) -> openVault(p, v));
+            
+            String displayName = net.md_5.bungee.api.ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
+            try {
+                int v = Integer.parseInt(displayName.replaceAll("[^0-9]", ""));
+                // Fix lỗi Folia tại đây: Dùng Task trực tiếp cho Player
+                p.getScheduler().run(this, (task) -> openVault(p, v), null);
+            } catch (Exception ignored) {}
+            
         } else if (t.contains("Kho đồ số ")) {
-            int v = Integer.parseInt(t.replaceAll("[^0-9]", ""));
-            Bukkit.getRegionScheduler().runDelayed(this, p.getLocation(), (tk) -> manager.save(p, v, e.getInventory()), 1L);
+            try {
+                int v = Integer.parseInt(t.replaceAll("[^0-9]", ""));
+                manager.save(p, v, e.getInventory());
+            } catch (Exception ignored) {}
         }
     }
 
     @EventHandler
     public void onClose(InventoryCloseEvent e) {
         if (e.getView().getTitle().contains("Kho đồ số ")) {
-            int v = Integer.parseInt(e.getView().getTitle().replaceAll("[^0-9]", ""));
-            manager.save((Player) e.getPlayer(), v, e.getInventory());
-            play((Player) e.getPlayer(), "vault-close");
+            try {
+                String title = e.getView().getTitle();
+                int v = Integer.parseInt(title.replaceAll("[^0-9]", ""));
+                manager.save((Player) e.getPlayer(), v, e.getInventory());
+                play((Player) e.getPlayer(), "vault-close");
+            } catch (Exception ignored) {}
         }
     }
 
     private void play(Player p, String k) {
         p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("settings.sounds." + k)), 1f, 1f);
     }
-              }
+    }
