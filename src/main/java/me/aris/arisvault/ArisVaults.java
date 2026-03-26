@@ -84,35 +84,30 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
+        
+        if (e.getInventory().getHolder() instanceof VaultHolder) {
+            return; 
+        }
+
         String title = e.getView().getTitle();
         String menuTitle = ColorUtils.color(getConfig().getString("settings.menu.title"));
-
         if (title.equals(menuTitle)) {
-            if (e.getClickedInventory() == e.getView().getTopInventory()) {
-                e.setCancelled(true);
-                if (e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta()) return;
-                String rawName = net.md_5.bungee.api.ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
-                try {
-                    int v = Integer.parseInt(rawName.replaceAll("[^0-9]", ""));
-                    p.getScheduler().run(this, (task) -> openVault(p, v), null);
-                } catch (Exception ignored) {}
-            }
+            e.setCancelled(true);
+            if (e.getClickedInventory() != e.getView().getTopInventory()) return;
+            if (e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta()) return;
+            String rawName = net.md_5.bungee.api.ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
+            try {
+                int v = Integer.parseInt(rawName.replaceAll("[^0-9]", ""));
+                p.getScheduler().run(this, (task) -> openVault(p, v), null);
+            } catch (Exception ignored) {}
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClose(InventoryCloseEvent e) {
-        String title = e.getView().getTitle();
-        String strippedTitle = net.md_5.bungee.api.ChatColor.stripColor(title);
-        
-        if (strippedTitle.contains("Vault #") || strippedTitle.contains("Kho đồ số")) {
-            try {
-                String numOnly = strippedTitle.replaceAll("[^0-9]", "");
-                if (numOnly.isEmpty()) return;
-                int v = Integer.parseInt(numOnly);
-                manager.save((Player) e.getPlayer(), v, e.getInventory());
-                play((Player) e.getPlayer(), "vault-close");
-            } catch (Exception ignored) {}
+        if (e.getInventory().getHolder() instanceof VaultHolder holder) {
+            manager.save((Player) e.getPlayer(), holder.getNumber(), e.getInventory());
+            play((Player) e.getPlayer(), "vault-close");
         }
     }
 
@@ -121,4 +116,4 @@ public class ArisVaults extends JavaPlugin implements Listener, CommandExecutor 
             p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("settings.sounds." + k)), 1f, 1f);
         } catch (Exception ignored) {}
     }
-                }
+            }
