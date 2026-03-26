@@ -28,7 +28,7 @@ public class VaultManager {
     public Inventory get(Player p, int n) {
         int r = plugin.getConfig().getInt("settings.vault.rows") * 9;
         String t = ColorUtils.color(plugin.getConfig().getString("settings.vault.title").replace("%number%", String.valueOf(n)));
-        Inventory inv = Bukkit.createInventory(null, r, t);
+        Inventory inv = Bukkit.createInventory(new VaultHolder(n), r, t);
         File f = new File(plugin.getDataFolder() + "/data", p.getUniqueId() + ".yml");
         if (f.exists()) {
             YamlConfiguration c = YamlConfiguration.loadConfiguration(f);
@@ -39,4 +39,4 @@ public class VaultManager {
         }
         return inv;
     }
-        }
+}
